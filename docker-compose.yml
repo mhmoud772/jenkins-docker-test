@@ -17,10 +17,8 @@ services:
     image: postgres:alpine
     environment:
       POSTGRES_PASSWORD: mypassword
-     Volumes:  
-    # تلاحظ# ربط مجلد بيانات قاعدة البيانات بمجلد وهمي (Volume) لضمان عدم ضياعها
+     Volumes:    
       - postgres_data:/var/lib/postgresql/data
 
-# تعريف الـ Volume في نهاية الملف ليتم إنشاؤه بواسطة Docker
 volumes:
   postgres_data: أننا لم نضع ports لـ Postgres لأننا نريد حمايتها داخل الشبكة فقط
