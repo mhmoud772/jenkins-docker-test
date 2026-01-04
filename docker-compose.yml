@@ -17,8 +17,8 @@ services:
     image: postgres:alpine
     environment:
       POSTGRES_PASSWORD: mypassword
-    Volumes:    
+    volumes:    
       - postgres_data:/var/lib/postgresql/data
 
 volumes:
-  postgres_data: أننا لم نضع ports لـ Postgres لأننا نريد حمايتها داخل الشبكة فقط
+  postgres_data: 
