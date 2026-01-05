@@ -7,12 +7,6 @@ services:
       - "9001:80"
     restart: always
     
-  web-prod:
-    build: .
-    ports:
-      - "9002:80"
-    restart: always
-
   my-db:
     image: postgres:alpine
     environment:
