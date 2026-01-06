@@ -1,6 +1,49 @@
-h1{
-   
+/* style.css */
+
+/* Reset بعض التنسيقات الافتراضية */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
 }
-body{
-  background-color: rgb(38, 38, 155);
+
+/* الخلفية العامة للجسم */
+body {
+  background-color: #f4f4f9;
+  color: #333;
+  line-height: 1.6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
 }
+
+/* تنسيق الـ div الرئيسي */
+div {
+  background-color: #ffffff;
+  padding: 30px 40px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+/* تنسيق العناوين */
+h1 {
+  color: #007acc;
+  margin-bottom: 15px;
+}
+
+h2 {
+  color: #555;
+  margin-top: 20px;
+}
+
+/* تنسيق الفقرة */
+p {
+  font-size: 16px;
+  margin-top: 10px;
+  color: #666;
+}
+
+/* تعليق مميز */
