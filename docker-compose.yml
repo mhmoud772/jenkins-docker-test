@@ -5,14 +5,19 @@ services:
     build: .
     ports:
       - "9001:80"
+    depends_on:
+      - my-db # لن يبدأ بايثون إلا بعد تشغيل قاعدة البيانات
     restart: always
-    
+
   my-db:
     image: postgres:alpine
     environment:
-      POSTGRES_PASSWORD: mypassword
-    volumes:    
+      POSTGRES_DB: mydb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
       - postgres_data:/var/lib/postgresql/data
+    restart: always
 
 volumes:
-  postgres_data: 
+  postgres_data:
