@@ -1,30 +1,58 @@
-from flask import Flask
+from flask import Flask, request
 import psycopg2
+from datetime import datetime
 import os
 
 app = Flask(__name__)
 
-# جلب بيانات الاتصال من متغيرات البيئة (أفضل ممارسة في دوكر)
-DB_HOST = "my-db" # اسم الخدمة في docker-compose
-DB_NAME = "mydb"
-DB_USER = "user"
-DB_PASS = "password"
+# إعدادات الاتصال
+DB_CONFIG = {
+    "host": "my-db",
+    "database": "mydb",
+    "user": "user",
+    "password": "password"
+}
+
+def init_db():
+    """إنشاء الجدول إذا لم يكن موجوداً"""
+    conn = psycopg2.connect(**DB_CONFIG)
+    cur = conn.cursor()
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS visits (
+            id SERIAL PRIMARY KEY,
+            visitor_ip TEXT,
+            visit_time TIMESTAMP
+        );
+    ''')
+    conn.commit()
+    cur.close()
+    conn.close()
 
 @app.route('/')
 def hello():
-    try:
-        # محاولة الاتصال بقاعدة البيانات
-        conn = psycopg2.connect(
-            host=DB_HOST, database=DB_NAME, user=DB_USER, password=DB_PASS
-        )
-        cur = conn.cursor()
-        cur.execute('SELECT version();')
-        db_version = cur.fetchone()
-        cur.close()
-        conn.close()
-        return f"<h1>Python connected to Postgres!</h1><p>DB Version: {db_version}</p>"
-    except Exception as e:
-        return f"<h1>Error!</h1><p>{str(e)}</p>"
+    init_db() # التأكد من وجود الجدول
+    
+    # حفظ الزيارة الحالية
+    conn = psycopg2.connect(**DB_CONFIG)
+    cur = conn.cursor()
+    cur.execute("INSERT INTO visits (visitor_ip, visit_time) VALUES (%s, %s)", 
+                (request.remote_addr, datetime.now()))
+    
+    # جلب آخر 5 زيارات
+    cur.execute("SELECT visitor_ip, visit_time FROM visits ORDER BY visit_time DESC LIMIT 5")
+    rows = cur.fetchall()
+    
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    # تنسيق النتيجة للعرض
+    html = "<h1>Welcome! Python & Postgres are working!</h1>"
+    html += "<h3>Recent Visitors:</h3><ul>"
+    for row in rows:
+        html += f"<li>IP: {row[0]} | Time: {row[1]}</li>"
+    html += "</ul>"
+    return html
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=80)
