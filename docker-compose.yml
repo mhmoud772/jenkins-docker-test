@@ -5,19 +5,44 @@ services:
     build: .
     ports:
       - "9001:80"
-    depends_on:
-      - my-db # لن يبدأ بايثون إلا بعد تشغيل قاعدة البيانات
+    environment:
+      - DB_HOST=my-db
+      - DB_NAME=mydb
+      - DB_USER=myuser
+      - DB_PASS=supersecretpassword
+    # سياسة إعادة التشغيل: إذا سقطت الحاوية، دوكر يعيدها فوراً
     restart: always
+    # فحص الحالة: التأكد من أن التطبيق يستجيب فعلياً
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    depends_on:
+      my-db:
+        condition: service_healthy
 
   my-db:
     image: postgres:alpine
     environment:
-      POSTGRES_DB: mydb
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      - POSTGRES_DB=mydb
+      - POSTGRES_USER=myuser
+      - POSTGRES_PASSWORD=supersecretpassword
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser -d mydb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # إدارة السجلات: منع امتلاء مساحة السيرفر
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 volumes:
   postgres_data:
